@@ -1,0 +1,111 @@
+{% extends 'webapp/base.html' %}
+
+
+{% block content %}
+
+
+<script type="text/javascript">
+ $( function() {
+		//setTimeout("timout()", 60000 * 5);		
+		console.log("started");
+
+$("#datepickerxx").datepicker({	dateFormat: 'yy-mm-dd',
+								onSelect: function(dateText, inst){
+													var url = "daily_error_details?date="+dateText;
+													location.href = url;
+												}
+							});		
+
+      
+   }); //-------------------end init-----------------------------------------------------------
+
+
+		
+function timout()	{
+		location.href = "{% url 'webapp:logout' %}"
+	}
+
+
+</script>
+
+<body width="90%">
+	{% include "./bNavBar.html" %}   
+<H2>Daily Error Details and Total Occupancy for {{date}} as of 12:01 AM</H2>
+
+<H2>User = {{user}}</H2>
+
+
+<div  id="datepickerxx"  ></div>
+<div style="height:20px;"> </div>
+<div class="option-bar">
+	<span   id="datepicked"> {{date}} </span>
+	<span width="20px"> </span>
+		<button class="print-button" onclick="window.print()"> Print </button>
+</div>
+
+</div>
+
+	
+{% if beds|length == 0 %}		
+<h3> There are no errors on this date</h3>		
+
+{%else%}
+<table cellspacing="1" cellpadding="2" bgcolor="#000000" class="TableAlteringRows">
+<thead>
+<tr style="font-weight:bold;background-color:#ECA927" class="tableHeader">	
+	<td>Unit</td>
+	<td>Room</td>
+	<td>Name</td>
+	<td>Status</td>
+	<td align="center">LOC</td>
+	<td>Gender</td>
+	<td align="right">Admit&nbsp;Date</td>
+	<td>In Bed</td>
+	<td>Reason</td>
+	<td>Comments</td>
+	
+</tr>
+</thead>
+<tbody id="bedcheck">
+{% for bed in beds %}
+	<tr> 
+		<td>{{bed.Unit}}</td>
+		<td> {{bed.Room}}</td>
+		<td class="name">{{bed.ResidentName}}</td>
+		<td> {{bed.Status}}</td>
+		<td> {{bed.LevelOfCare}}</td>
+		<td align="center" class="{{bed.Gender}}"> {{bed.Gender}}</td>
+		<td> {{bed.CurrentAdmitDate|date:'Y-m-d'}}</td>
+		<td>{{bed.Inbed}}</td>
+		<td> {{bed.Reason|default_if_none:""}}</td>
+		<td> {{bed.Comments|default_if_none:""}}  </td>			
+	</tr>
+{% endfor %}
+</tbody>
+</table>
+{%endif%}
+
+<p>
+<table  border="1">
+<tbody>
+	
+	<tr>
+		<td>Unit</td>
+			{% for pair in totals%}
+				<td>{{pair.0}}</td>
+			{%endfor%}
+		</tr>
+	<tr>
+		<td>Occupancy</td>
+		{% for pair in totals%}
+			<td>{{pair.1}}</td>
+		{%endfor%}
+	</tr>
+
+</tbody>
+</table>
+
+
+
+</body>
+{% endblock %}

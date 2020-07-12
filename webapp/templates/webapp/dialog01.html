@@ -1,0 +1,32 @@
+{% extends 'webapp/base.html' %}
+
+
+{% block content %}
+<body style="width: 960px; height: 100%; margin-top: 100px">
+
+
+<div class="center-div" style="width:100%;">
+
+<H2>Census Notification Form </H2>
+<select name="event" id="event" onchange="select_event(this)" style="display:block;margin:auto;">
+	<option value="Select a census type . . .">Select a census type . . .</option>
+	<option selected="selected" value="Adm">Admission</option>
+	<option value="RCh">Room Change</option>
+	<option value="T2H">Out to Hospital</option>
+	<option value="TfH">Return from Hospital</option>
+	<option value="T2L">Out to Leave of Absence</option>
+	<option value="TfL">Return from Leave of Absence</option>
+	<option value="Disch">Discharge</option>
+	<option value="Exp">Death</option>
+
+</select>
+
+<button id="#ShowPatientPicker" onclick="showPatientPicker();">Find Patient</button> 
+ <button class="delete-action">Open</button>
+</div>
+
+{% include "./dialog01popup.html" %}    
+
+
+</body>
+{% endblock %}

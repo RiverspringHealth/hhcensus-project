@@ -1,0 +1,114 @@
+{% extends 'webapp/base.html' %}
+
+
+{% block content %}
+{% load app_filters %} 
+
+
+<script type="text/javascript">
+ $( function() {
+		//setTimeout("timout()", 60000 * 5);		
+		console.log("started");
+
+    $("#selectmonth").change(function(){
+		console.log("gothere");
+        var yyyy_mm_dd = $(this).children("option:selected").val();
+		location.href  = "monthly_summary?start="+yyyy_mm_dd ;
+        //alert("You have selected the date - " + yyyy_mm_dd);
+
+    });	
+
+	$("#bedcheck td").click(function() {
+		var unit = $(this).attr('data-unit');
+		var date = $(this).attr('data-date');
+		var url = "daily_error_details?unit=" + unit + "&date="+date;
+		console.log(url);
+		location.href=url;
+	});
+      
+   }); //-------------------end init
+
+
+		
+function timout()	{
+		location.href = "{% url 'webapp:logout' %}";
+	}
+	
+
+
+		
+</script>
+<body style="margin:10px;">
+	{% include "./bNavBar.html" %}   
+<h2 > Census Monthly Summary </h2>
+
+<div id="top"  >
+	<select id="selectmonth">
+			{% for item in months %}
+				<option value="{{item|date:'Y-m-d'}}" 
+				{% if item == selectedmonth %}selected="selected"{% endif %}>
+				{{item|date:'F Y'}}
+				</option>
+			{% endfor %}
+	</select>
+
+
+<button class="round_button" onclick="window.print()"> Print </button>
+
+</div>
+
+	
+		
+		
+
+
+<table cellspacing="1" cellpadding="2" bgcolor="#000000" class="TableRedAndGreen">
+<thead>
+<tr style="font-weight:bold;background-color:white" >	
+	<td>Weekday</td>
+	<td>Date</td>
+	{% for unit in units %}
+		<td>{{unit}}</td>
+	{%endfor%}
+</tr>
+</thead>
+<tbody id="bedcheck">
+{% for repdate in errors %}
+	<tr>
+		<td style="font-weight:normal;background-color:white;text-align:left;">{{repdate|date:'l'}}</td>
+		<td style="font-weight:normal;background-color:white;padding:2px 5px 2px 5px"> {{repdate|date:'n/j/Y'}}</td>
+		{% for unit in units %}
+			<td    data-unit="{{unit}}"  data-date="{{repdate|date:'Y-m-d'}}"
+			{% if errors|lookup:repdate|lookup:unit == maxdays %}
+				  style="background-color:#cc3300;width:25px;">
+			{% elif errors|lookup:repdate|lookup:unit != 0 %}
+				 style="background-color:red;color:white;width:25px;">
+			{% else %}
+				style="width:25px;" 
+			{% endif %}
+			{{errors|lookup:repdate|lookup:unit|default_if_none:''}}</td>
+		{% endfor %}		
+	</tr>
+{%endfor%}
+
+	
+	<tr style="background-color:darkgray;color:black;align:center; padding:5;">
+		<td style="text-align: center;">Summary</td>
+		<td style="text-align: center;"> Total</td>
+		<td  style="text-align: center;" colspan="{{units|length}}"> Units </td>
+	</tr>
+	{% for total in totals %}
+	<tr style="color:white;background-color:{{total|lookup:'background'}};">
+		
+		<td style="text-align:right">{{total|lookup:'title'}}</td>
+		<td style="text-align:right;">{{total|lookup:'total'}}</td>
+		{% for unit in units %}
+			<td style="text-align:center;">{{total|lookup:unit}}</td>
+		{% endfor %}
+	</tr>
+	{%endfor%}
+	
+
+
+</body>
+{% endblock %}

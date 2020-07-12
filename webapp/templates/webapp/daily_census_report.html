@@ -1,0 +1,111 @@
+{% extends 'webapp/base.html' %}
+
+{% block content %}
+
+
+<script type="text/javascript">
+
+
+var page_loaded = false;
+
+ $( function() {
+		//setTimeout("timout()", 60000 * 5);		
+		console.log("started");
+	
+      
+   }); //-------------------end init
+		
+
+
+
+
+
+function timout()	{
+		location.href = "{% url 'webapp:logout' %}"
+	}
+	
+
+
+</script>
+
+
+<body width="90%">
+	{% include "./bNavBar.html" %}    
+	<h2> Daily Census Report {{repdate}} Unit:{{unit}}</h2>
+	
+
+<nav class="option-bar"
+	<button class="print_button" onclick="window.print()">Print </button>
+	<button onclick="history.back(-1);"  > Go Back </button>
+</nav>
+
+
+
+		
+
+<table cellspacing="1" cellpadding="2" bgcolor="#000000" class="TableAlteringRows">
+<thead>
+<tr style="font-weight:bold;background-color:#ECA927" class="tableHeader">	
+	<td>&nbsp;</td>
+	<td>Room</td>
+	<td>Name</td>
+	<td>Resident#</td>
+	<td>Gender</td>
+	<td align="right">Admit&nbsp;Date</td>
+	<td>Status</td>
+	<td align="center">LOC</td>
+	<td align="center">Inbed</td>
+	<td>Reason</td>
+	<td>Comments</td>
+	<td>Updated&nbsp;By</td>
+	<td align="right">Updated&nbsp;Time</td>
+	
+</tr>
+</thead>
+<tbody id="bedcheck">
+{% for bed in beds %}
+	<tr id="{{bed.id}}" data-changed="No"  {% if bed.ResidentNumber != '' %}
+												class="occupied"
+											{% else %}
+												class="not-occupied"
+											{% endif %}
+											> 
+
+		<td> {{ forloop.counter }} </td> 
+	
+	
+		<td> {{bed.Room}} </td>
+					
+
+		{% if bed.ResidentName != '' %}
+			<td>{{bed.ResidentName}}</td>
+			<td> {{bed.ResidentNumber}}</td>
+			<td class="{{bed.Gender}}"> {{bed.Gender}}</td>
+			<td> {{bed.CurrentAdmitDate}}</td>
+			<td> {{bed.Status}}</td>
+			<td> {{bed.LevelOfCare}}</td>
+			<td> {{bed.Inbed}}</td>
+			<td> {{bed.Reason}}</td>
+			<td> {{bed.Comments}}</td>
+			<td> {{bed.UpdatedByName|default_if_none:""}}</td>
+			<td> {{bed.UpdateDatetime|date:'Y-m-d H:i'}}</td>
+			
+			
+		{% endif %}
+	</tr>
+{% endfor %}
+
+
+
+</tbody></table>
+
+
+
+	</td>
+</tr>
+</tbody></table>
+
+
+
+</body>
+{% endblock %}

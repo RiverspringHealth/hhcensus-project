@@ -1,0 +1,3 @@
+create schema mydata
+go
+

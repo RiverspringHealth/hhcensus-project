@@ -1,0 +1,20 @@
+{% extends 'webapp/base.html' %}
+
+
+{% block content %}
+<body >
+	
+	{% include "./bNavBar.html" %}    
+<h1> This is the new Census Report using data from MatrixCare</h1>
+<h2> user={{user}}</h2>
+{% include "./userguide.html" %}    
+<!--
+<h1><a href="notifications"> Census Notifications </a><h1></h1>
+<h1><a href="daily_error_details"> Daily Error Details (aka Census Tracking -- Access View)</a><h1>
+<h1><a href="census_edit">Census Tracking - Nursing View (Nightly Bed Check) </a><h1>
+<h1><a href="monthly_summary"> Monthly Summary (Red/Green grid) </a><h1>
+<h1><a href="resident_location"> Census Tracking - Resident Location Listing </a><h1>
+<h1><a href="daily_details"> Daily Census Report </a><h1>
+-->    
+</body>
+{% endblock %}

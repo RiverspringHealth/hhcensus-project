@@ -1,0 +1,22 @@
+############# determins appropriate dir based on OS  appdirs==1.4.3
+############# successor to wsgi   asgiref==3.2.5
+############ used by lint   astroid==2.3.3
+######## for color output on terminals colorama==0.4.3
+############## pacaging tool used by pyinstaller?  distlib==0.3.0
+Django==2.1.15
+############################django-computed-property==0.3.0
+django-pyodbc-azure==2.1.0.0
+######################## file lock  filelock==3.0.12
+############### sorts imports isort==4.3.21
+lazy-object-proxy==1.4.3
+############### code checker  mccabe==0.6.1
+################### lint  pylint==2.4.4
+###################pyodbc==4.0.27
+python-dateutil==2.8.1
+################## timezone handling not needed pytz==2019.3
+################# refactoring  rope==0.16.0
+########### python 2~3 compatibility six==1.15.0
+#used for parsing sql to support something else  sqlparse==0.3.1
+virtualenv==20.0.13  #not really needed, but perhaps in future
+wfastcgi==3.0.0
+################## for decorators wrapt==1.11.2

@@ -1,0 +1,54 @@
+<h3>----------------------include starts-----------------</h3>
+<style type="text/css">
+.ui-widget-header,.ui-state-default, ui-button{
+            background:#b9cd6d;
+            border: 1px solid #b9cd6d;
+            color: #FFFFFF;
+            font-weight: bold;
+         	}
+
+</style>
+<div id="PatientPickerDialog"  style="display: inline-block">
+<!--Creates the popup content-->
+ <div  class="xxxxxpopup-content">
+    <h2>PatientPickerDialog</h2>
+<script>
+
+$( function() {
+	 var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	console.log("inside include init");
+	var i;
+	for (i = 0; i < ALPHABET.length; i++) {
+  		var letter  = ALPHABET[i];
+//console.log(letter);
+		$( "<button id='" + letter + "' class='round_button'>"+letter+"</button>" ).insertBefore("#start-here");
+		//console.log(button);
+	}
+	$( "#ShowPatientPicker" ).dialog({ 	modal:true,
+										 
+         								position:'center',
+         								height:400,
+										width:400,
+										autoOpen: false,
+										 buttons: {
+							            	DELETE: function() {$(this).dialog("close");},
+							                CANCEL: function() {$(this).dialog("close");}
+							            }, 
+									});
+});
+	
+	
+</script>
+
+    <p> This is an example pop-up that you can make using jQuery.</p>
+<div id="filter_bar" >
+  <button class="round_button">spare</button>
+  <button class="round_button">spare</button>
+  <span id="start-here"></span>
+</div>
+   <!--popup's close button-->
+    <button class="close">Close</button>    
+</div>
+
+</div>
+<h3>------------------------include ends ------------------------</h3>

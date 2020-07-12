@@ -1,0 +1,130 @@
+<script>
+
+$( function() {
+	var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	var SelectedLetter = "A";
+	var SelectedStatus = "All";
+	console.log("inside include init");
+	var i;
+	for (i = 0; i < ALPHABET.length; i++) {
+  		var letter  = ALPHABET[i];
+		$( "<button id='" + letter + "' class='round_button'>"+letter+"</button>" ).insertBefore("#start-here");
+	}
+	
+	$( ".dialog" ).dialog({
+					        autoOpen: false, 
+					        modal: true,
+							width: "900",
+					        buttons: { CANCEL: function() {$(this).dialog("close");},  },
+				      });	
+
+	filter_people();
+
+	
+	$("#filter_bar button").click(function(e){
+		var letter =   $(this).attr('id');
+        $("#filter_bar button").css({"background-color": "blue", "color": "white"});
+        $("#filter_bar #"+letter).css({"background-color": "yellow", "color": "black"});
+		SelectedLetter = letter;
+		filter_people();
+	});	
+	
+	$("#CensusStatus").change(function(e){
+		SelectedStatus = $(this).val();
+		filter_people();
+	});	
+
+	
+	
+function filter_people() {
+        $("#people tr").hide();
+	    //console.log(  $(this).attr('id')  );
+		var lastname =  "#people tr." + SelectedLetter ; 
+		var status = "." + SelectedStatus;
+        $(lastname).filter(status).show();   	
+}
+	
+
+   $("#people tr").click(function (e) {
+	   console.log("start click");
+        var lastname  = $(this).attr('data-lastname');
+		var firstname = $(this).attr('data-firstname');
+		var bed       = $(this).attr('data-bed');
+		var LoC       = $(this).attr('data-loc');
+        console.log("row click "+lastname +" " + firstname+" " + bed+" " + LoC);
+		$("#id_lastname").val(lastname);
+		$("#id_firstname").val(firstname);
+		$('#id_oldbed').val(bed)
+		$('#id_oldloc').val(LoC)
+		
+		$("#patientpicker").dialog("close");
+     });
+
+	
+});	
+
+
+
+</script>
+
+
+
+
+
+
+<div class="dialog" id="patientpicker" title="Select a Resident" style="display: inline-block">
+	<table>
+	<thead>
+	<tr> <th> Status</th> <th> First Letter of Last Name </th> </tr>
+	</thead>
+	<tbody> 
+	<tr>
+		<td> 
+			<select id = "CensusStatus">
+					<option value="All"  selected>All</option>
+					{% for status in status_choices %}
+						<option value="{{status}}"
+							{% if status == "All" %} " selected " {% endif %}
+						>{{status}}</option>
+					{% endfor %}
+					
+				
+				</select>
+		 </td>
+		<td>   
+		<div id="filter_bar" class="nav-bar" >
+		 	<span id="start-here"></span>
+		</div>	
+		</td>
+	</tr>
+	</tbody>
+	</table>
+	
+	
+<table class="TableAlteringRows">
+<thead>
+<tr>
+<th>Last Name</th> <th> First Name </th> <th> Census Status </th> <th> Gender </th> <th> Level of Care </th> <th> Bed </th>
+</tr>
+</thead>
+<tbody  id="people">
+
+{% for patient in patients %}
+
+<tr class="{{patient.Letter}} {{patient.CensusStatus}} All" 
+	data-lastname="{{patient.LastName}}"
+	data-firstname="{{patient.FirstName}}"
+	data-bed="{{patient.RoomAndBed}}"
+	data-loc="{{patient.LevelOfCare}}" 
+	>
+		<td> {{patient.LastName}}</td>
+		<td> {{patient.FirstName}}</td>
+		<td> {{patient.CensusStatus}}</td>
+		<td> {{patient.Sex}}</td>	
+		<td> {{patient.LevelOfCare}}</td>
+		<td> {{patient.RoomAndBed}}</td>
+</tr>
+{% endfor %}
+</tbody>
+  
+</div>

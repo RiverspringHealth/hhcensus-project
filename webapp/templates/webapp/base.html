@@ -1,0 +1,173 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <title>HH Census</title>
+  
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'webapp/css/style.css' %}">
+		
+		
+<style type="text/css">
+
+
+.InbedYes {
+	background-color:greenyellow;
+}
+
+
+
+.ErrorMessage {
+	color: #ff0000;
+	font-weight: bold;
+}
+
+.frm_label {
+	text-align: right;
+	font-weight: bold;
+}
+
+input[type=text], input[type=password] {
+	border: 1px solid #000;
+	padding: 5px;
+	width: 200px;
+}
+
+select, textarea {
+	border: 1px solid #000;
+}
+
+.pageHeader {
+	background-color: #ECA927;
+	color: #ffffff;
+	font-size: 24px;
+	border: 1px solid #000;
+	
+	border-collapse: collapse;
+}
+
+.tableHeader {
+	background-color: #ECA927;
+	color: #ffffff;
+	font-size: 14px;
+	border: 1px solid #000;
+	
+	border-collapse: collapse;
+}
+
+
+.TableAlteringRows {
+	font-size: 12px;
+}
+
+.TableAlteringRows TR:nth-child(odd) {
+	background-color: #EEC980;
+	color:black;
+}
+
+.TableAlteringRows TR:nth-child(even) {
+	background-color: #ffffff;
+	color: black;
+}
+
+.TableAlteringRows TR TD A:nth-child(even) {
+	color: #000000;
+}
+T
+.TableAlteringRows THEAD TR TD{
+	color: black;
+}
+
+.TableRedAndGreen tbody {
+	background-color: green;
+	
+	
+}
+
+.error {
+	background-color: red;
+	color:white;
+	
+}
+
+TD {
+	padding: 3px;
+}
+
+
+.form-table {
+    background: white;
+    border-collapse: collapse;
+    width: auto;
+}
+
+.form-table tr{
+    border: 1px solid white;
+}
+
+.form-table td, .form-table {
+    width: auto;
+    white-space: nowrap;
+    background: white;
+    border: 0px ;
+}
+
+.ui-widget-header,.ui-state-default, ui-button{
+            background:#b9cd6d;
+            border: 1px solid #b9cd6d;
+            color: #FFFFFF;
+            font-weight: bold;
+         	}
+
+table.errors head {
+	background-color:#FFFFFF;
+	color:#000;
+}
+table.errors body {
+	background-color:green;
+	color:white;
+}
+
+.not-occupied {
+	background-color:lightgrey;
+	color:lightgrey;
+}
+
+.occupied {
+	
+}
+}
+</style>
+
+
+<script>
+  $( function() {
+      	$( ".dobpicker" ).datepicker({yearRange: "-100:+0",	changeYear: true});
+      	$( ".datepicker").datepicker({format: 'yyyy-mm-dd'    });
+      
+
+       
+ });
+</script>
+
+    </head>
+ 
+
+
+
+
+           {% block content %}
+					base block content should be overwritten
+            {% endblock %}
+	
+
+	
+
+</html>

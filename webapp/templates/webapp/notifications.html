@@ -1,0 +1,239 @@
+{% extends 'webapp/base.html' %}
+
+
+{% block content %}
+
+
+<script type="text/javascript">
+//var current_unit='G1';
+
+$(document).ready( function() {
+		//setTimeout("timout()", 60000 * 5);		
+		console.log("started");
+		var page_loaded = false;
+		PersonDialog = $( "#xxxShowPatientPicker" ).dialog({ 	modal:true,
+                             								position:'center',
+                             								height:400,
+															width:400,
+															autoOpen: false 
+														});
+														
+		
+
+ $( ".delete-action" ).click(function() {
+    	    $( "#delete" ).dialog( "open" );
+        });
+
+
+	$("#id_action").change(function(e){
+		var action = $(this).val();
+		var url = "?action=" + action;
+		console.log("select event type " + url);
+		location.href = url;
+		
+	});	
+      
+}); //-------------------end init
+		
+
+
+
+function showPatientPicker(){
+	console.log("show patient picker ");
+	 $( "#patientpicker" ).dialog( "open" );
+
+}
+
+
+
+
+		
+</script>
+
+<body style="width: 960px; margin-top: 20px">
+    {% include "./bNavBar.html" %}   
+
+<div class="center-div" style="width:100%;">
+
+<H2> 
+	{%if action == '0' %}
+		Enter Census
+	{% else %}
+		{{ action }} 
+	{% endif %}
+	Notification 
+</H2>
+
+
+<H2>User = {{user}}</H2>
+
+<form method="POST" action="notifications">
+   {% csrf_token %}
+
+
+
+<table width="100%" style="background-color: #E7E7E7; margin: 30px 0px 5px 0px">
+		<thead>
+		<tr>
+        	
+        	<td colspan="4" align="center"> {{form.action }} </td>
+        </tr>
+		</thead>
+{% if action != '0' %}		
+        <tbody>
+        
+		<tr>
+            <td align="right">
+				<button id="ShowPatientPicker" onclick="showPatientPicker();" class="action">Show Patients</button> 
+				&nbsp; &nbsp;  First Name      
+			</td>
+            <td id="firstname">{{form.firstname}}</td>
+            <td align="right">  Last Name  </td>
+            <td id="lastname" align="left"> {{form.lastname}}    </td>
+        </tr>
+
+        <tr></tr>
+
+        <tr>
+            <td  align="right"> Date</td>
+            <td ><input class='datepicker' name="date"  id="event_date" required > </td>
+            <td align="right">            Time			</td>
+			<td>	<input type="time" id="time" name="time" required>            </td>
+            
+        </tr>
+ 
+        
+{% if action == "Admission" %}
+        <tr>
+            <td  align="right">Room</td>
+            <td >{{form.newbed}} </td>
+            <td align="right">          Admitted From	</td>
+			<td>	{{form.admitfrom}}       </td>
+        </tr>
+ 
+         <tr>
+         	<td/>
+         	<td/>
+            <td  align="right">Level of Care</td>
+            <td >{{form.newloc}} </td>
+        </tr>
+ {% elif action == "Room Change" %}
+        <tr>
+            <td  align="right">Transfer From</td>
+            <td id="oldbed">{{form.oldbed}} </td>
+            <td align="right"> Transfer To	</td>
+			<td>	{{form.newbed}}       </td>
+        </tr>
+ 
+         <tr>
+            <td align="right">Prior Level of Care</td>
+            <td id="oldloc"> {{form.oldloc}} </td>
+            <td  align="right">Level of Care</td>
+            <td >{{form.newloc}} </td>
+        </tr>
+        
+{% elif action == "Out to Hospital" %}
+        <tr>
+            <td  align="right">From Room</td>
+            <td id="oldbed">{{form.oldbed}} </td>
+            <td align="right"> Transfer To	</td>
+			<td>	{{form.dischargeto}}       </td>
+        </tr>
+        <tr>
+            <td align="right">Prior Level of Care</td>
+            <td id="oldloc"> {{form.oldloc}} </td>
+            <td/>
+            <td/>
+        </tr>
+ 
+ {% elif action == "Return from Hospital" %}
+        <tr>
+            <td  align="right">Room</td>
+            <td >{{form.newbed}} </td>
+            <td align="right"> Transfer from	</td>
+			<td>	{{form.admitfrom}}       </td>
+        </tr>
+ 
+         <tr>
+         	<td/>
+         	<td/>
+            <td  align="right">Level of Care</td>
+            <td >{{form.newloc}} </td>
+        </tr>     
+        
+{% elif action == "Out to Leave of Absence" %}
+        <tr>
+            <td  align="right">Prior Room</td>
+            <td id="oldbed">{{form.oldbed}} </td>
+            <td align="right"> Transfer To	</td>
+			<td>	{{form.dischargeto}}       </td>
+        </tr>
+        <tr>
+            <td align="right">Prior Level of Care</td>
+            <td id="oldloc"> {{form.oldloc}} </td>
+            <td/>
+            <td/>
+        </tr>
+ 
+{% elif action == "Return from Leave of Absence" %}
+        <tr>
+            <td  align="right">Room</td>
+            <td >{{form.newbed}} </td>
+            <td align="right"> Transfer from	</td>
+			<td>	{{form.admitfrom}}       </td>
+        </tr>
+ 
+         <tr>
+            <td align="right">Prior Level of Care</td>
+            <td id="oldloc"> {{form.oldloc}} </td>
+            <td  align="right">New Level of Care</td>
+            <td >{{form.newloc}} </td>
+        </tr>     
+ 
+ {% elif action ==  "Discharge" %}
+        <tr>
+            <td  align="right">Room</td>
+            <td id="oldbed">{{form.oldbed}} </td>
+            <td align="right"> Transfer to	</td>
+			<td>	{{form.dischargeto}}       </td>
+        </tr>
+        <tr>
+            <td align="right">Prior Level of Care</td>
+            <td> {{form.oldloc}} </td>
+            <td/>
+            <td/>
+       </tr>     
+ 
+ {% elif action ==  "Deceased" %}
+        <tr>
+            <td  align="right">Room</td>
+            <td id="oldbed">{{form.oldbed}} </td>
+            <td align="right">Prior Level of Care</td>
+            <td> {{form.oldloc}} </td>            
+        </tr>
+        
+{% else %}
+         <tr><td> There is no form defined for the action: {{action}} </td></tr>
+        
+ {% endif %}          
+        
+		<tr>
+			<td/>
+			<td align="right"> <input type="submit" name="btnSubmit" value="Submit"  id="btnSubmit" class="submit-button"></td>
+			<td align="right"> Entered By </td>
+			<td> {{form.user}}</td>
+		</tr>        
+          </tbody>
+{% endif %}          
+</table>
+ 
+</form>
+</div>
+
+
+
+
+
+{% include "./dialog01popup.html" %}    
+   </body>
+{% endblock %}
