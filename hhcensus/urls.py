@@ -21,7 +21,7 @@ from django.views.generic import RedirectView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+   # path('/', include('webapp.urls', namespace='webapp')),
     path('webapp/', include('webapp.urls', namespace='webapp')),
    # path('favicon', RedirectView.as_view(url='practice/static/images/favicon.ico')),
    # path('accounts/login', auth_views.LoginView.as_view() ),  # new

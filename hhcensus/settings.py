@@ -43,9 +43,9 @@ ALLOWED_HOSTS = ['*'] #todo restrict to RiverSpring domain.
 # The django module is not capable of handling attachments, which are needed for Sagely
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  #True=errors show up on web page; False errors emailed to ADMINS
+DEBUG = True  #True=errors show up on web page; False errors emailed to ADMINS
 PRODUCTION_EMAIL = False
-PRODUCTION = False
+PRODUCTION = True
 
 if PRODUCTION:
     BED_STATUS_LOCK_HOUR = 8  #becomes 8:00 am
