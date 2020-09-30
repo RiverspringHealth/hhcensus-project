@@ -54,9 +54,7 @@ else:
     BED_STATUS_LOCK_HOUR = 16  #becomes 4:00 pm for testing
     DATABASES = development.DATABASES
 
-TEST_EMAIL_RECIPIENTS =  [  'frederick.sells@RiverSpringHealth.org', 
-                            'jonathan.clark@RiverSpringHealth.org',
-                            'antonique.martin@RiverSpringHealth.org']
+TEST_EMAIL_RECIPIENTS =  [  'antonique.martin@RiverSpringHealth.org']
 
 ADMINS =   [ ('DjangoAdmin', 'ADMINS@RiverSpringHealth.org'), ]
 
