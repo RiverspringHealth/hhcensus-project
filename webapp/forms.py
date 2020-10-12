@@ -17,7 +17,7 @@ NO_CHANGE = [ ('No Change', 'No Change')]
 UNUSED_FIELDS = {None: ['firstname', 'lastname', 'date', 'time','oldloc', 'oldbed', 'dischargeto', 'admitfrom', 'newloc', 'newbed'],
                  ADMISSION:['oldloc', 'oldbed', 'dischargeto'],
                  ROOM_CHANGE:['admitfrom', 'dischargeto'], 
-                 OUT_TO_HOSPITAL:[ 'newloc', 'newbed', 'admitfrom'],
+                 OUT_TO_HOSPITAL:[  'newloc', 'newbed', 'admitfrom'],
                  RETURN_FROM_HOSPITAL:['oldloc',  'oldbed', 'dischargeto'],
                  OUT_TO_LEAVE_OF_ABSENCE:['newbed', 'newloc',  'admitfrom'],
                  RETURN_FROM_LEAVE_OF_ABSENCE :['oldbed',  'dischargeto'],
@@ -54,10 +54,11 @@ class CensusChangeForm(forms.Form):
     lastname  = forms.CharField(max_length=30)
     date      = forms.DateField(label="Date:", input_formats=settings.DATE_INPUT_FORMATS, widget=forms.TextInput(attrs={'class': "datepicker"}))
     time      = forms.TimeField(label="Time:")
-    oldbed = forms.CharField(label='From Room', max_length=50, widget=forms.TextInput(attrs={'readonly':'readonly'}))
-    newbed = forms.ChoiceField(label='To Room', choices=CHOICES.Beds)
+    #oldbed = forms.CharField(label='From Room', max_length=50, widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    oldbed = forms.CharField(label='From Room', max_length=10)
+    newbed = forms.CharField(label='To Room', max_length=10)
     newloc = forms.ChoiceField(label='Level of Care', choices=CHOICES.LevelOfCare)
-    oldloc = forms.CharField(label='Prior Level of Care',  max_length=50, widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    oldloc = forms.ChoiceField(label='Prior Level of Care',  choices=CHOICES.LevelOfCare)
     admitfrom = forms.ChoiceField(label='Admitted From', choices=CHOICES.AdmittedFrom)
     dischargeto = forms.ChoiceField(label='Discharged To', choices=CHOICES.DischargedTo)
     user = forms.CharField(label='User', max_length=50, widget=forms.TextInput(attrs={'readonly':'readonly'}))

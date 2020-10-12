@@ -43,12 +43,12 @@ ALLOWED_HOSTS = ['*'] #todo restrict to RiverSpring domain.
 # The django module is not capable of handling attachments, which are needed for Sagely
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  #True=errors show up on web page; False errors emailed to ADMINS
-PRODUCTION_EMAIL = False
+DEBUG = False  #True=errors show up on web page; False errors emailed to ADMINS
+PRODUCTION_EMAIL = True
 PRODUCTION = True
 
 if PRODUCTION:
-    BED_STATUS_LOCK_HOUR = 8  #becomes 8:00 am
+    BED_STATUS_LOCK_HOUR = 23  #becomes 8:00 am
     DATABASES = production.DATABASES
 else:
     BED_STATUS_LOCK_HOUR = 16  #becomes 4:00 pm for testing
@@ -62,6 +62,7 @@ ADMINS =   [ ('DjangoAdmin', 'ADMINS@RiverSpringHealth.org'), ]
 if PRODUCTION_EMAIL:   #use this flag when testing production system before going live
     EMAIL_SUBJECT_PREFIX = ''  # default='[Django] '
     CENSUS_RECIPIENTS = ['censusnotification@hebrewhome.org']   
+    #CENSUS_RECIPIENTS = ['Frederick.Sells@hebrewhome.org']   
     FROM_EMAIL_ADDRESS = 'no-reply@hebrewhome.org'
     SAGELY2_DISTRIBUTION_LIST = ['Sagely2@hebrewhome.org']
     CENSUS_UPDATE_REPORT_RECIPIENTS = ['CensusUpdateReport@hebrewhome.org']
