@@ -62,7 +62,7 @@ ADMINS =   [ ('DjangoAdmin', 'ADMINS@RiverSpringHealth.org'), ]
 if PRODUCTION_EMAIL:   #use this flag when testing production system before going live
     EMAIL_SUBJECT_PREFIX = ''  # default='[Django] '
     CENSUS_RECIPIENTS = ['censusnotification@hebrewhome.org']   
-    #CENSUS_RECIPIENTS = ['Frederick.Sells@hebrewhome.org']   
+    CENSUS_RECIPIENTS.append('Frederick.Sells@hebrewhome.org')  #@todo remove this line, only for testing
     FROM_EMAIL_ADDRESS = 'no-reply@hebrewhome.org'
     SAGELY2_DISTRIBUTION_LIST = ['Sagely2@hebrewhome.org']
     CENSUS_UPDATE_REPORT_RECIPIENTS = ['CensusUpdateReport@hebrewhome.org']
