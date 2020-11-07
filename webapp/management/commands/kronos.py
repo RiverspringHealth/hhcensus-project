@@ -5,7 +5,7 @@ This is a Django command that copies data from MyData to the kronos table.
 
 @author: fsells
 '''
-
+import datetime
 from django.core.management.base import BaseCommand, CommandError
 from webapp import sql_api
 
@@ -23,6 +23,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         save = options['save']
         DB = sql_api.DatabaseQueryManager()
+        now = datetime.datetime.now()
+        print (now)
         records = DB.get_unit_summary()
         if save:
             pass
