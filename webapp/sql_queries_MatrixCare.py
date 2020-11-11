@@ -12,7 +12,7 @@ UNIT_SUMMARY = '''SELECT
 			WHEN  DATEPART(HOUR, GETDATE()) BETWEEN 13 and 14 THEN 'Eve'
 			WHEN  DATEPART(HOUR, GETDATE()) BETWEEN 21 and 22 THEN 'Eve'
 			ELSE 'XXX'
-		END [Shift]
+		END [Shift] 
   FROM [CensusApps].[mydata].[vwAllBedsAndCurrentOccupants]
   WHERE PatientID IS NOT NULL and LastStatus='In House'
   group by UnitName
@@ -45,7 +45,7 @@ All_BEDS_AND_CURRENT_OCCUPANTS = '''
         ORDER BY UnitName, RoomName, BedName
         '''
 
-SAGELY2 = '''/****** Script for SelectTopNRows command from SSMS  ******/
+SAGELY2 = '''
 SELECT 
 	pat.MedicalRecordNumber
 	, pat.LastName [Resident_Last]
@@ -65,10 +65,17 @@ SELECT
 			WHEN ecphone.AreaCode IS NOT NULL THEN  CONCAT('(', ecphone.AreaCode, ') ', ecphone.Prefix, '-', ecphone.Suffix) 
 			ELSE NULL
 	  END [EmergencyPhone] 
-	, pat.Sex [Gender]
+	, CASE pat.Sex 
+		   WHEN 'M' THEN 'Male'
+		   WHEN 'F' THEN 'Female'
+		   ELSE pat.Sex
+	  END [Gender]
 	, NULL [Ethnicity] --not used
 	, NULL [HomeTown] -- not used
-	, pse.LastStatus [Status]
+	, CASE pse.LastStatus 
+		   WHEN 'In House' THEN 'Active'
+		   ELSE pse.LastStatus
+	  END [Status]
 	, CONVERT(VARCHAR(12), pse.AdmitDate, 101) [MoveInDate]
 	, bed.RoomName [Room]
 	, SUBSTRING(bed.UnitName, 2, 1) [Floor]
