@@ -71,6 +71,38 @@ class DatabaseQueryManager(object):
         records = self.get_something(SQL.ALL_BEDS)
         return records
 
+    def insert_unit_totals(self, date, shift, totals):
+        sql = ''' INSERT INTO dbo.UnitTotalsByShift (Census_Date,  Shift, Location, Patient_Count)
+                  VALUES (CAST('{}' AS DATE), '{}', %s, %s)'''.format(date, shift)
+        if self.DEBUG: print(sql)
+        cursor = self.Connection.cursor()
+        cursor.executemany(sql, totals)
+        cursor.commit()
+        cursor.close()
+       
+
+
+    def query(self, sql, show_names=True):
+        if self.DEBUG: print('\nquery', sql)
+        cursor = self.Connection.cursor()
+        cursor.execute(sql)
+        records = cursor.fetchall() 
+        if show_names:
+            names = tuple([column[0] for column in cursor.description] )
+            records = [names ] + records
+        cursor.close()
+        return records
+
+    def get_unit_totals(self): 
+        sql = ''' SELECT *  FROM mydata.vwTotalOccupancyByUnit ORDER BY UnitName'''
+        records = self.query(sql)
+        return records
+
+    def get_inhouse_patients(self):
+        sql = '''SELECT * FROM mydata.vwPatientInhouse ORDER BY UnitName, LastName, FirstName'''
+        records = self.query(sql)
+        return records
+ 
     def get_patients(self):
         records = self.get_something(SQL.ALL_PATIENTS)
         return records
