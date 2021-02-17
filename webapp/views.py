@@ -186,8 +186,8 @@ def monthly_summary(request):
     
     
 ###############################################################################################
-@never_cache
-def notifications(request):
+
+def old_notifications(request):
     user = request.META['REMOTE_USER']
     now=datetime.datetime.now().timestamp()
     TEMPLATE = 'webapp/notifications.html'
@@ -204,7 +204,7 @@ def notifications(request):
         values['user']  = user.replace('HHAR\\','')
         record = CensusChangeLog(**values)
         record.save()
-        return redirect('/webapp/notifications')
+        return render(request, 'webapp/notifications_done.html')
     else:  ####################################  GET method ##################################
         action = request.GET.get('action', '0')
         if action == None:
@@ -216,12 +216,7 @@ def notifications(request):
             context = dict(user=user, form=form, action=action, patients=patients, status_choices = status_choices, now=now)
             return render(request, TEMPLATE, context)
         
-# def daily_census_report(request):
-#     TEMPLATE = 'webapp/daily_census_report.html'
-#     unit = request.GET.get('unit', None)
-#     date = request.GET.get('date', None)
-#     date = datetime.datetime.strptime('%Y-%m-%d')
-#     print(unit, date)
-#     context = dict()
-#     return render(request, TEMPLATE, context)
+@never_cache
+def notifications(request):
+    return old_notifications(request)
 
