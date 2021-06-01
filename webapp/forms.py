@@ -32,7 +32,7 @@ class Choices(object):
         self.LevelOfCare = [(r['Description'], r['Description']) for r in records]
         records = DB.get_beds()
         records = [ '{}-{}/{}'.format(r['UnitName'], r['RoomName'], r['BedName']) for r in records]
-        self.Beds = [ (name,name) for name in records]
+        self.Beds = [(u'', 'Select Bed')] + [ (name,name) for name in records] 
         records = DB.get_admit_discharge_locations()
         admitfrom = [r['LocationName'] for r in records if r['isAdmitLocation']]
         dischargeto = [r['LocationName'] for r in records if r['isDischargeLocation']]
@@ -54,8 +54,12 @@ class CensusChangeForm(forms.Form):
     lastname  = forms.CharField(max_length=30)
     date      = forms.DateField(label="Date:", input_formats=settings.DATE_INPUT_FORMATS, widget=forms.TextInput(attrs={'class': "datepicker"}))
     time      = forms.TimeField(label="Time:")
-    oldbed = forms.ChoiceField(label='From Room', choices=CHOICES.Beds)
-    newbed = forms.ChoiceField(label='To Room', choices=CHOICES.Beds)
+    oldbed = forms.ChoiceField(label='From Room', required=True, choices=CHOICES.Beds)
+    newbed = forms.ChoiceField(label='To Room',   required=True, choices=CHOICES.Beds)
+
+    newbed = forms.ChoiceField(label='To Room',   required=True, choices=CHOICES.Beds)
+
+
     newloc = forms.ChoiceField(label='Level of Care', choices=CHOICES.LevelOfCare)
     oldloc = forms.ChoiceField(label='Prior Level of Care',  choices=CHOICES.LevelOfCare)
     admitfrom = forms.ChoiceField(label='Admitted From', choices=CHOICES.AdmittedFrom)

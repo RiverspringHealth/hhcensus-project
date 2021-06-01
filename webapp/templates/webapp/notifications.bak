@@ -18,15 +18,7 @@ $(document).ready( function() {
 															autoOpen: false 
 														});
 														
-
-
-        $("#myform").keydown(function(event){
-            if(event.keyCode == 13) {
-                event.preventDefault();
-                alert("keycaught ");
-                return false;
-            }
-        });
+		
 
  $( ".delete-action" ).click(function() {
     	    $( "#delete" ).dialog( "open" );
@@ -40,17 +32,10 @@ $(document).ready( function() {
 		location.href = url;
 		
 	});	
-
-    $("#myform").submit(function(event){
-            $("#btnSubmit").attr('disabled', 'disabled');
-           
-            console.log("clicked");
-           // event.preventDefault()
-            return true;
-        });
       
 }); //-------------------end init
 		
+
 
 
 function showPatientPicker(){
@@ -67,7 +52,6 @@ function showPatientPicker(){
 
 <body style="width: 960px; margin-top: 20px">
     {% include "./bNavBar.html" %}   
-    <P> </P>
 
 <div class="center-div" style="width:100%;">
 
@@ -83,7 +67,7 @@ function showPatientPicker(){
 
 <H2>User = {{user}}</H2>
 
-<form method="POST" action="notifications"  id="myform">
+<form method="POST" action="notifications">
    {% csrf_token %}
 
 
@@ -234,9 +218,9 @@ function showPatientPicker(){
  {% endif %}          
         
 		<tr>
-			<td> <span> &nbsp; </span></td>
+			<td/>
 			<td align="right"> <input type="submit" name="btnSubmit" value="Submit"  id="btnSubmit" class="submit-button"></td>
-			<td align="right"> Entered By: </td>
+			<td align="right"> Entered By </td>
 			<td> {{form.user}}</td>
 		</tr>        
           </tbody>
@@ -245,7 +229,6 @@ function showPatientPicker(){
  
 </form>
 </div>
-<h4>Revised 3/3/2021 at 2:21pm</h4>
 
 
 

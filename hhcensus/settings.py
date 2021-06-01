@@ -66,7 +66,7 @@ if PRODUCTION_EMAIL:   #use this flag when testing production system before goin
     CENSUS_RECIPIENTS = ['censusnotification@hebrewhome.org']   
     CENSUS_RECIPIENTS.append('Frederick.Sells@hebrewhome.org')  #@todo remove this line, only for testing
     FROM_EMAIL_ADDRESS = 'no-reply@hebrewhome.org'
-    SAGELY2_DISTRIBUTION_LIST = ['Sagely2@hebrewhome.org']
+    SAGELY2_DISTRIBUTION_LIST = ['Sagely2@hebrewhome.org', 'frederick.sells@riverspringhealth.org']
     CENSUS_UPDATE_REPORT_RECIPIENTS = ['CensusUpdateReport@hebrewhome.org']
 else:
     SAGELY2_DISTRIBUTION_LIST = TEST_EMAIL_RECIPIENTS

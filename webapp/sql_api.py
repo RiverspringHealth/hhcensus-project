@@ -132,13 +132,36 @@ class DatabaseQueryManager(object):
         results = [names] + records
         return results
 
-    def get_sagely2(self):
+    def get_values(self, sql, include_column_names=True):
         cursor = self.Connection.cursor()
-        cursor.execute(SQL.SAGELY2)
+        cursor.execute(sql)
         records = cursor.fetchall() 
-        names = tuple([column[0] for column in cursor.description] )
-        results = [names ] + records
+        if include_column_names:
+            names = tuple([column[0] for column in cursor.description] )
+            results = [names ] + records
         return results
+
+    def get_sagely2(self):
+        return self.get_values(SQL.SAGELY2)
+
+
+    def get_admissions(self, start='4/1/2021', stop='5/1/2021'):
+        sql = '''   select p.* 
+                    FROM CensusApps.dbo.vwPatientToRaisersEdge AS p
+                    JOIN CensusApps.mydata.Patient   ON PatientID = ImportID
+                    WHERE CurrentAdmtDt >= '{}'  AND CurrentAdmtDt <= '{}'
+            '''.format(start, stop)
+        print(sql)
+        return self.get_values(sql)
+
+    def get_contacts(self, start='4/1/2021', stop='5/1/2021'):
+        sql = '''   select c.* 
+                    FROM CensusApps.dbo.vwConstituentsToRaisersEdge AS c
+                    JOIN CensusApps.mydata.Patient   ON PatientID = ImportID
+                    WHERE CurrentAdmtDt >= '{}'  AND CurrentAdmtDt <= '{}'
+            '''.format(start, stop)
+        print(sql)
+        return self.get_values(sql)       
 
 def quickprint(title, records):
     for record in records: print(title, record)

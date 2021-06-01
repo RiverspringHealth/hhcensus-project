@@ -55,20 +55,15 @@ def insert_data(Connection, start, end,  data):
                     ,Obsolete)   
                  VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)
                  '''
-    Cursor.executemany(sql, data)
+    sql = 'SELECT 1 [test]'
+    Cursor.execute(sql) #many(sql, data)
     Connection.commit()
     Cursor.close()    
 
 def execute(source, destination, startdate, enddate, save):
-    data = get_old_data(source, startdate, enddate)
-    print(len(data[0]), data[0])
-    if save:
-        insert_data(destination, startdate, enddate, data)
-        print ('%s records inserted  into target database' % (len(data),))
-    else:
-        for x in data[:9]: print('census:', x)
-        print('DEBUG=True, no data written to DB')
-
+    admissions = []
+    contacts = []
+    residents = []
 
 
 class Command(BaseCommand):
@@ -77,23 +72,23 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--start', action= 'store', help = 'first day of copy mm/dd/yyyy',
                             type=lambda s: datetime.datetime.strptime(s, '%m/%d/%Y'),
-                            default = datetime.date.today())
+                            default = datetime.date.today().replace(day=1))
         parser.add_argument('--end', action= 'store', help = 'last day of copy mm/dd/yyyy',
                             type=lambda s: datetime.datetime.strptime(s, '%m/%d/%Y'),
-                            default = datetime.date.today())
+                            default = datetime.date.today() )
 
-        parser.add_argument('--target', action='store', help='dev (default) for dev server, prod for production server'  ,
+        #parser.add_argument('--target', action='store', help='dev (default) for dev server, prod for production server'  ,
                             default = 'dev')
-        parser.add_argument('--save', action= 'store_true', help = 'required to write data to target', default=False)
+        #parser.add_argument('--save', action= 'store_true', help = 'required to write data to target', default=False)
         
 
     def handle(self, *args, **options):
         startdate = options['start']
         enddate = options['end']
-        save = options['save']
+        #save = options['save']
         source = pyodbc.connect(settings.HHARWEB2_CONNECTION_STRING)
         target = connection # from settings DATABASES
-        execute(source, target, startdate, enddate, save)
+        #execute(source, target, startdate, enddate, save)
         print('copy done')
 
     
