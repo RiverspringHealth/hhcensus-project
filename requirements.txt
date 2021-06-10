@@ -3,7 +3,7 @@
 ############ used by lint   astroid==2.3.3
 ######## for color output on terminals colorama==0.4.3
 ############## pacaging tool used by pyinstaller?  distlib==0.3.0
-Django==2.1.15
+Django==2.2.24
 ############################django-computed-property==0.3.0
 django-pyodbc-azure==2.1.0.0
 ######################## file lock  filelock==3.0.12
