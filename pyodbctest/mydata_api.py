@@ -144,8 +144,8 @@ class MyDataQueryManager(object):
 def unittest():
     mydata = MyDataQueryManager()
     sweeptime = datetime.datetime.now()
-    records = mydata.get_beds_x_patients()
-    for p in records: print('bex_patient', p) 
+    #records = mydata.get_beds_x_patients()
+   # for p in records: print('bex_patient', p) 
     print ('mydata_api unittest done')
         
 if __name__ == '__main__':
