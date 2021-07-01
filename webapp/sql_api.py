@@ -71,13 +71,15 @@ class DatabaseQueryManager(object):
         records = self.get_something(SQL.ALL_BEDS)
         return records
 
-    def insert_unit_totals(self, date, shift, totals):
-        sql = ''' INSERT INTO dbo.UnitTotalsByShift (Census_Date,  Shift, Location, Patient_Count)
-                  VALUES (CAST('{}' AS DATE), '{}', %s, %s)'''.format(date, shift)
-        if self.DEBUG: print(sql)
+    def executemany(self, sql, values):
         cursor = self.Connection.cursor()
-        cursor.executemany(sql, totals)
-        cursor.commit()
+        cursor.executemany(sql, tuple(values))
+        cursor.commit() 
+        cursor.close()
+       
+    def execute(self, sql):
+        cursor = self.Connection.cursor()
+        cursor.execute(sql)
         cursor.close()
        
 
@@ -93,12 +95,12 @@ class DatabaseQueryManager(object):
         cursor.close()
         return records
 
-    def get_unit_totals(self): 
-        sql = ''' SELECT *  FROM mydata.vwTotalOccupancyByUnit ORDER BY UnitName'''
-        records = self.query(sql)
-        return records
+    # def get_unit_totals(self): 
+    #     sql = ''' SELECT *  FROM mydata.vwTotalOccupancyByUnit ORDER BY UnitName'''
+    #     records = self.query(sql)
+    #     return records
 
-    def get_inhouse_patients(self):
+    def get_inhouse_patients(self):  #used only by raisers_edge
         sql = '''SELECT * FROM mydata.vwPatientInhouse ORDER BY UnitName, LastName, FirstName'''
         records = self.query(sql)
         return records
@@ -144,6 +146,15 @@ class DatabaseQueryManager(object):
     def get_sagely2(self):
         return self.get_values(SQL.SAGELY2)
 
+    # def get_occupancy_snapshot(self, querytime):
+    #     sql = SQL.OCCUPANCY_SNAPSHOT.format(querytime)
+    #     cursor = self.Connection.cursor()
+    #     cursor.execute(sql)
+    #     cursor.execute('SELECT * FROM @totals ORDER BY UnitName')
+    #     records = cursor.fetchall() 
+    #     names = tuple([column[0] for column in cursor.description] )
+    #     results = [names ] + records
+    #     return results
 
     def get_admissions(self, start='4/1/2021', stop='5/1/2021'):
         sql = '''   select p.* 
@@ -170,12 +181,12 @@ def quickprint(title, records):
 @utilities.record_elapsed_time    
 def unittest():
     mydata = DatabaseQueryManager()
-    quickprint('level of care',  mydata.get_level_of_care_definitions() )
-    quickprint('beds', mydata.get_beds() )
-    quickprint('patients', mydata.get_patients() )
-    quickprint('LoA',  mydata.get_leave_of_absence_definitions())
-    quickprint('Admit-DC Locations', mydata.get_admit_discharge_locations())
-    quickprint('Positive Census', mydata.get_all_beds_and_current_occupants())
+    #quickprint('level of care',  mydata.get_level_of_care_definitions() )
+    # quickprint('beds', mydata.get_beds() )
+    # quickprint('patients', mydata.get_patients() )
+    # quickprint('LoA',  mydata.get_leave_of_absence_definitions())
+    # quickprint('Admit-DC Locations', mydata.get_admit_discharge_locations())
+    # quickprint('Positive Census', mydata.get_all_beds_and_current_occupants())
 
 if __name__ == '__main__':
     print ('starting sql api')
