@@ -129,6 +129,6 @@ OUTER APPLY (
 				AND LEN(ph.AreaCode)>0
 			ORDER BY pt.SortOrder
 	) AS ecphone 
-ORDER BY Resident_Last, Resident_First, DOB
+ORDER BY Resident_Last, Resident_First, DOB  '''
 
-  '''
+
