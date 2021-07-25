@@ -22,15 +22,16 @@ from webapp import sql_api
 
 help = 'blah blah blah 4/9/2020 [--save]'
 
-SENDTO=['development-census@riverspring.org']
+QUERY = '''select * from CensusApps.dbo.vwEXPORTToRaisersEdge
+ WHERE OriginalAdmtDt >= '{}' AND OriginalAdmtDt <='{}'
+  ORDER BY IRLastName, IRFirstName'''
+
+SENDTO=['frederick.sells@riverspring.org',
+        'Neusa.Delgado@riverspring.org',
+       # 'johanna.perez@riverspring.org',
+        #'CensusDev@hebrewhome.org',   ############ WARNING, this distro list fails the send process !!!!
+       ]
               
-
-
-
-
-
-
-
 class Command(BaseCommand):
     help = '''USEAGE: email admissions between start and stop dates or for prior week if not specified
                 this program will attach files as .csv to email send to raisersedge distribution list
@@ -44,23 +45,12 @@ class Command(BaseCommand):
 
         
 
-    def ooocompose_email(self, date, shift, totals):
-        texttitle = 'Kronos was updated at %s with date=%s and shift=%s\n\n' % (datetime.datetime.now(), date, shift)
-        texttotals = ['%10s = %s' % row for row in totals]
-        textbody = texttitle + '\n'.join(texttotals)
-        #print(textbody)
-        subject = 'TESTING ONLY:Kronos update date=%s shift=%s' % (date, shift)
-        htmlrecords = ['<TR><TD>%s</TD><TD>%s</TD></TR>' % row for row in totals]
-        htmlbody = '<H2>%s</H2><TABLE border="1">%s</TABLE>' % (texttitle, ''.join(htmlrecords))
-        #print(htmlbody)
-        patients=self.DBAPI.get_inhouse_patients()
-        write_file(KRONOS_DETAIL_CSV, patients)
-        self.send_email(sendto=SEND_EMAIL_TO, subject=subject, text=textbody, html=htmlbody, path=KRONOS_DETAIL_CSV)
+
 
     def send_email(self, sendto=SENDTO, subject='testing raisers edge', text='', html='testing', folder='D:\Temp', attachments=[]):
         outer = MIMEMultipart("alternative")
         outer['Subject'] = subject
-        outer['From'] = 'donotreply@hebrewhome.org'
+        outer['From'] = 'no-reply@hebrewhome.org'
         outer['To'] = ', '.join(sendto)
         part1 = MIMEText(text, "plain")
         part2 = MIMEText('<p>'+html+'</p>', "html")
@@ -92,23 +82,48 @@ class Command(BaseCommand):
         begin = begin or (prior_sunday + relativedelta.relativedelta(weekday=relativedelta.SU(-2)) )
         stop = stop or (prior_sunday + relativedelta.relativedelta(weekday=relativedelta.SA(-1)) )
         return (begin, stop)
-       
+
+    def scrub_data(self, records):
+        PHONE_TYPES = 36, 40, 44
+        for row in records[1:]:
+            row[0] = row[0].strftime('%Y-%m-%d %H:%M')
+            key = row[1][1:]
+            size = len(row)
+            for i in range(2,size):
+                row[i] = row[i].replace('???', key) 
+                for c in PHONE_TYPES:
+                    if row[c] == '': row[c-1]=row[c-2]=row[c-3] = ''
+        [print (x) for x in records]
+        #print( [x for x in enumerate(records[0])])
+
+    def get_admissions_and_contacts(self, start, stop):
+        db = sql_api.DatabaseQueryManager()
+        sql = QUERY.format('{} 00:00'.format(start), '{} 23:59'.format(stop))
+        records = db.get_values(sql)
+        records = [list(row) for row in records]
+        return self.scrub_data(records)
+        # for r in records[:5]: print(r)
+        #for row in records[1:]:  #skip header
+            
+        
+
+
         
     def handle(self, *args, **options):
-        (start, stop)self.get_sample_period(options)
-        print(start)
-        print(stoop)
-        return
+        (start, stop) = self.get_sample_period(options)
         now = datetime.datetime.now()
-        print('handle', args, options)
-        db = sql_api.DatabaseQueryManager()
-        admissions = db.get_admissions(start, stop)
-        contacts = db.get_contacts(start, stop)
-        self.write_file('admissions.csv', admissions)
-        self.write_file('contacts.csv', contacts)
-        self.send_email(sendto=SENDTO, subject='testing raisers edge', text='', html='testing', folder='D:\Temp', 
-                        attachments=('admissions.csv', 'contacts.csv'))
-        print('done')
+        suffix = '_{}_to_ {}.csv'.format(start, stop)
+        text_body = 'Production date run = {}, \n\rrange of admission dates = {} ...{}'.format(now, start, stop)
+        html_body = 'Productiondate run = {}, <P>range of admission dates = {} ...{}'.format(now, start, stop)
+        subject='Admissions for Raisers Edge as of: {}'.format(now.strftime('%Y-%m-%d %H:%M'))
+        records = self.get_admissions_and_contacts(start, stop)
+        return
+        self.write_file('mx_EXPORT_ToRE_IndividualRelations{}'.format(suffix), admissions)
+        #for a in admissions: print(a)
+        self.write_file('mx_EXPORT_ToRE_Constituent{}'.format(suffix), contacts)
+        # self.send_email(sendto=SENDTO, subject=subject, text=text_body, html=html_body, folder='D:\Temp', 
+        #                 attachments=('admissions.csv', 'contacts.csv'))
+        print('done {}  {} admissions, {} constituents'.format(suffix, len(admissions), len(contacts)))
 
 
     
