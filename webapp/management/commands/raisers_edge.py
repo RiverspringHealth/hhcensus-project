@@ -21,9 +21,10 @@ from django.conf import settings
 from webapp import sql_api
 
 help = 'blah blah blah 4/9/2020 [--save]'
+MIDNIGHT = datetime.timedelta(hours=23, minutes=59)
 
 QUERY = '''select * from CensusApps.dbo.vwEXPORTToRaisersEdge
- WHERE OriginalAdmtDt >= '{}' AND OriginalAdmtDt <='{}'
+ WHERE OriginalAdmtDt >= '{}' AND OriginalAdmtDt <='{} 23:59'
   ORDER BY IRLastName, IRFirstName'''
 
 SENDTO=['frederick.sells@riverspring.org',
@@ -38,16 +39,18 @@ class Command(BaseCommand):
     '''
               
     def add_arguments(self, parser):
-        parser.add_argument('--start', action= 'store', help = 'admissions after this date mm/dd/yyyy', default = None)
+        parser.add_argument('--start', action= 'store', help = 'admissions after this date mm/dd/yyyy', 
+                           type=lambda s: datetime.datetime.strptime(s, '%m/%d/%Y'),
+                            default = None)
         parser.add_argument('--stop', action= 'store', help = 'last day of copy mm/dd/yyyy',  
-                            #type=lambda s: datetime.datetime.strptime(s, '%m/%d/%Y'),
+                           type=lambda s: datetime.datetime.strptime(s, '%m/%d/%Y'),
                             default = None)
 
         
 
 
 
-    def send_email(self, sendto=SENDTO, subject='testing raisers edge', text='', html='testing', folder='D:\Temp', attachments=[]):
+    def send_email(self, sendto=SENDTO, subject='testing raisers edge', text='', html='testing',  attachments=[]):
         outer = MIMEMultipart("alternative")
         outer['Subject'] = subject
         outer['From'] = 'no-reply@hebrewhome.org'
@@ -56,8 +59,7 @@ class Command(BaseCommand):
         part2 = MIMEText('<p>'+html+'</p>', "html")
         outer.attach(part1)
         outer.attach(part2)
-        for attachment in attachments:
-            path = os.path.join(folder, attachment)
+        for path in attachments:
             with open(path, 'rb') as fp:
                     part = MIMEBase("application", "octet-stream")
                     part.set_payload(fp.read())
@@ -67,12 +69,7 @@ class Command(BaseCommand):
         s.send_message(outer)
         s.quit()
 
-    def write_file(self, filename, records):
-        path = os.path.join('D:/Temp/', filename)
-        with open(path, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerows(records)
-        return path
+
 
     def get_sample_period(self, options):
         begin = options.get('start', None)
@@ -81,10 +78,15 @@ class Command(BaseCommand):
         prior_sunday = today - datetime.timedelta((today.weekday() + 1) % 7)
         begin = begin or (prior_sunday + relativedelta.relativedelta(weekday=relativedelta.SU(-2)) )
         stop = stop or (prior_sunday + relativedelta.relativedelta(weekday=relativedelta.SA(-1)) )
+        begin = begin.strftime('%Y-%m-%d')
+        stop = stop.strftime('%Y-%m-%d')
+        #print('date range', begin, stop)
         return (begin, stop)
 
     def scrub_data(self, records):
-        PHONE_TYPES = 36, 40, 44
+        PHONE_TYPES = 38, 42, 46  #the columns where the phone types are located
+        xxx = records[0].index('xxx')
+        records[0][xxx+1] = 'ImportID'  #sql does not allow identical column names in a view.
         for row in records[1:]:
             row[0] = row[0].strftime('%Y-%m-%d %H:%M')
             key = row[1][1:]
@@ -93,37 +95,43 @@ class Command(BaseCommand):
                 row[i] = row[i].replace('???', key) 
                 for c in PHONE_TYPES:
                     if row[c] == '': row[c-1]=row[c-2]=row[c-3] = ''
-        [print (x) for x in records]
-        #print( [x for x in enumerate(records[0])])
+        relations = [row[:xxx]for row in records]
+        contacts  =[row[xxx+1:] for row in records] 
+        return relations, contacts
 
     def get_admissions_and_contacts(self, start, stop):
         db = sql_api.DatabaseQueryManager()
-        sql = QUERY.format('{} 00:00'.format(start), '{} 23:59'.format(stop))
+        sql = QUERY.format(start, stop)
+        #print(sql)
         records = db.get_values(sql)
         records = [list(row) for row in records]
-        return self.scrub_data(records)
-        # for r in records[:5]: print(r)
-        #for row in records[1:]:  #skip header
-            
-        
+        return records
+ 
 
-
+    def write_files(self, suffix, records):
+        prefix = 'mx_EXPORT_ToRE_'
+        datasets =  list(self.scrub_data(records))
+        paths = [ os.path.join('D:/Temp/', x.format(prefix,suffix)) for x in ['{}IndividualRelations{}', '{}Constituents{}']]
+        merged = zip(datasets, paths)
+        for (records, path) in merged:
+            #print(path)
+            with open(path, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerows(records)
+        return paths
         
     def handle(self, *args, **options):
         (start, stop) = self.get_sample_period(options)
         now = datetime.datetime.now()
-        suffix = '_{}_to_ {}.csv'.format(start, stop)
-        text_body = 'Production date run = {}, \n\rrange of admission dates = {} ...{}'.format(now, start, stop)
-        html_body = 'Productiondate run = {}, <P>range of admission dates = {} ...{}'.format(now, start, stop)
-        subject='Admissions for Raisers Edge as of: {}'.format(now.strftime('%Y-%m-%d %H:%M'))
+        suffix = '_{}_to_{}.csv'.format(start, stop)
+        #print('xxx{}xxx'.format(suffix))
+        text_body = 'Computed on {}'.format(now)
+        html_body = 'Computed on {}'.format(now)
+        subject='RE Admissions {}...{}'.format(start,stop)
         records = self.get_admissions_and_contacts(start, stop)
-        return
-        self.write_file('mx_EXPORT_ToRE_IndividualRelations{}'.format(suffix), admissions)
-        #for a in admissions: print(a)
-        self.write_file('mx_EXPORT_ToRE_Constituent{}'.format(suffix), contacts)
-        # self.send_email(sendto=SENDTO, subject=subject, text=text_body, html=html_body, folder='D:\Temp', 
-        #                 attachments=('admissions.csv', 'contacts.csv'))
-        print('done {}  {} admissions, {} constituents'.format(suffix, len(admissions), len(contacts)))
+        attachments = self.write_files(suffix, records)
+        self.send_email(sendto=SENDTO, subject=subject, text=text_body, html=html_body, attachments=attachments)
+        print('done {}  records= {} '.format(suffix, len(records)))
 
 
     
