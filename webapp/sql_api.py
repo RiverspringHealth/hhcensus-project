@@ -162,7 +162,7 @@ class DatabaseQueryManager(object):
                     JOIN CensusApps.mydata.Patient   ON PatientID = ImportID
                     WHERE CurrentAdmtDt >= '{}'  AND CurrentAdmtDt <= '{}'
             '''.format(start, stop)
-        print(sql)
+        #print(sql)
         return self.get_values(sql)
 
     def get_contacts(self, start='4/1/2021', stop='5/1/2021'):
@@ -171,7 +171,7 @@ class DatabaseQueryManager(object):
                     JOIN CensusApps.mydata.Patient   ON PatientID = ImportID
                     WHERE CurrentAdmtDt >= '{}'  AND CurrentAdmtDt <= '{}'
             '''.format(start, stop)
-        print(sql)
+        #print(sql)
         return self.get_values(sql)       
 
 def quickprint(title, records):
