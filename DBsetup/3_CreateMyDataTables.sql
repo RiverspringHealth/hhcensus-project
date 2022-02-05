@@ -513,3 +513,14 @@ CREATE TABLE [mydata].[PatientContact](
 	[MX1_PersonID] [int] NULL,
 	[MX1_ContactID] [int] NULL
 ) ON [PRIMARY];
+
+###################### add new tables required for RXNT export #########################################
+select * INTO mydata.FacilityPayers FROM [MATRIXCARE].[BIDW_50582_HebrewHome].[STVSNF].FacilityPayers
+select * INTO mydata.FacilityFacilityGroupXref FROM [MATRIXCARE].[BIDW_50582_HebrewHome].[STVSNF].FacilityFacilityGroupXref  
+select * INTO mydata.AR_PayerType FROM [MATRIXCARE].[BIDW_50582_HebrewHome].[STVSNF].AR_PayerType
+select * INTO mydata.AR_PayerGroup FROM [MATRIXCARE].[BIDW_50582_HebrewHome].[STVSNF].AR_PayerGroup
+select * INTO mydata.AR_Patient_Payer FROM [MATRIXCARE].[BIDW_50582_HebrewHome].[STVSNF].AR_Patient_Payer
+select * INTO mydata.Facility FROM [MATRIXCARE].[BIDW_50582_HebrewHome].[STVSNF].Facility
+select * INTO mydata.AR_PayerNameOverride  FROM [MATRIXCARE].[BIDW_50582_HebrewHome].[STVSNF].AR_PayerNameOverride
+
+#might need to add primary keys if too slow.
