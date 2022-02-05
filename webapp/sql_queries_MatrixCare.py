@@ -46,11 +46,11 @@ All_BEDS_AND_CURRENT_OCCUPANTS = '''
         '''
 
 SAGELY2 = '''
-SELECT 
-	pat.MedicalRecordNumber
+SELECT 1500 [Prop Code]
+	, pat.MedicalRecordNumber [Resident ID]
 	, pat.LastName [Resident_Last]
 	, pat.FirstName [Resident_First]
-	, CONVERT(VARCHAR(12), DateOfBirth, 101) [DOB]
+	, FORMAT (DateOfBirth, 'MM/dd/yyyy') [DOB]
 	, bed.UnitName [LevelOfCare] --unit goes here
 	, pat.MiddleName [MiddleName]
 	, NULL [MaidenName] -- not used
@@ -60,23 +60,20 @@ SELECT
 			ELSE NULL
 	  END [Phone] 
 	, NULL [Email] -- not used
-	, CONCAT(ec.FirstName, ' ', ec.LastName) [EmergencyName] --@
-	, CASE 
-			WHEN ecphone.AreaCode IS NOT NULL THEN  CONCAT('(', ecphone.AreaCode, ') ', ecphone.Prefix, '-', ecphone.Suffix) 
-			ELSE NULL
-	  END [EmergencyPhone] 
 	, CASE pat.Sex 
 		   WHEN 'M' THEN 'Male'
 		   WHEN 'F' THEN 'Female'
 		   ELSE pat.Sex
 	  END [Gender]
 	, NULL [Ethnicity] --not used
-	, NULL [HomeTown] -- not used
 	, CASE pse.LastStatus 
 		   WHEN 'In House' THEN 'Active'
+		   WHEN 'Discharged' THEN 'Inactive'
+		   WHEN 'Discharged RE' THEN 'Inactive'
+		   WHEN 'Expired' THEN 'Deceased'
 		   ELSE pse.LastStatus
 	  END [Status]
-	, CONVERT(VARCHAR(12), pse.AdmitDate, 101) [MoveInDate]
+	, FORMAT( pse.AdmitDate, 'MM/dd/yyyy') [MoveInDate]
 	, bed.RoomName [Room]
 	, SUBSTRING(bed.UnitName, 2, 1) [Floor]
 	, NULL [Diabetic]
