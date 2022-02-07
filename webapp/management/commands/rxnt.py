@@ -111,9 +111,7 @@ class Command(BaseCommand):
             attachments.append(path)
         self.send_email(attachments=attachments)
         return
-        records = self.get_data() 
-        path = self.write_file(records)
-        self.send_email(path)
+   
         
             
             

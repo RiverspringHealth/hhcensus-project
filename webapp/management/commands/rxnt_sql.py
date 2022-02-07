@@ -1,30 +1,32 @@
 INHOUSE_PATIENTS = '''
+/****** Script for SelectTopNRows command from SSMS  ******/
 SELECT 
-	pat.MedicalRecordNumber [Unique Patient ID]
-	,'' 					[Chart Number]]
-	, pat.FirstName 		[First Name]  
-	,'' 					[Middle Initial]
-	, pat.LastName 			[Last Name]]
-	, pat.Sex 				[Gender]
-	, FORMAT( DateOfBirth, 'MM/dd/yyyy') [Date of Birth]
+	inhouse.MedicalRecordNumber [Unique Patient ID]
+	,'' 						[Chart Number]
+	, inhouse.FirstName 		[First Name]  
+	,'' 						[Middle Initial]
+	, inhouse.LastName 			[Last Name]
+	, CASE  inhouse.Gender 
+		WHEN 'M' THEN 'Male'
+		ELSE 'Female'
+	END							[Gender]
+	, FORMAT( pat.DateOfBirth, 'MM/dd/yyyy') [Date of Birth]
 	, CONCAT(bed.UnitName,'-',bed.RoomName, '-', bed.BedName) [Address]
-	, '5901 Palisade Avenue' [Address (cont)]
-	,'10471' 				[Zip Code]
-	,'' 					[Zip Code Extention]
-	,'Riverdale' 			[City]
-	,'NY' 					[State Abbreviation]
-	,'' 					[Email Address]
-	,'718-581-1000' 		[Home Phone Number]  
-	,'' 					[Cell Phone Number]
-	,'' 					[Work Phone Number]
-	,'' 					[Other Phone Number]
-	
+	, '5901 Palisade Avenue'	[Address (cont)]
+	,'10471' 					[Zip Code]
+	,'' 						[Zip Code Extention]
+	,'Riverdale' 				[City]
+	,'NY' 						[State Abbreviation]
+	,'' 						[Email Address]
+	,'718-581-1000' 			[Home Phone Number]  
+	,'' 						[Cell Phone Number]
+	,'' 						[Work Phone Number]
+	,'' 						[Other Phone Number]
 
-FROM mydata.Patient AS pat --ON pat.PatientID = pse.PatientID
-JOIN mydata.vwPatientStayElementLatest AS pse on pse.PatientID=pat.PatientID AND pse.LastStatus='In House'
-JOIN mydata.FacilityUnitRoomBed AS bed ON bed.BedID=pse.BedID
-WHERE pat.CensusStatus='In House'
-Order BY pat.LastName, pat.FirstName
+  FROM [mydata].[vwPatientInhouse] AS inhouse
+  LEFT JOIN [mydata].Patient AS pat ON pat.PatientID=inhouse.PatientID
+  JOIN mydata.FacilityUnitRoomBed AS bed ON bed.BedID=inhouse.BedID
+  Order BY pat.LastName, pat.FirstName
 '''
 
 PAYERS = '''
@@ -50,15 +52,7 @@ select fp.PayerID			[Unique Payer ID]
      , NULL   [Primary Filing Method Code]
      , NULL   [Secondary Filing Method]
      , NULL   [Secondary Filing Method Code]
-
-/*	 
-	-- , fac.FacilityID, fac.Facilitytypecode, fac.isActive
-	 , fp.Statement_Form
-	 , fp.*
-	, pg.PayerGroupName--, pg.PayerGroupAbbrev
-	, pg.*
 --	, fac.Name
- */
 FROM mydata.FacilityPayers fp
 --LEFT JOIN mydata.AR_PayerType pt ON pt.PayerType=fp.PayerType
 --LEFT JOIN mydata.Facility AS fac on fac.FacilityID=fp.FacilityID
@@ -68,17 +62,11 @@ ORDER BY fp.Name
 
 CASES = '''
 	SELECT 
-		'' [A], pat.MedicalRecordNumber [B], '' [C], '' [D], '' [E] 
-		
-		,p1.PayerID [F] ,'' [G], '' [H], p1.PolicyNum [I], '' [J], '' [K], FORMAT(p1.BeginDate, 'MM/dd/yyyy') [L], FORMAT(p1.EndDate, 'MM/dd/yyyy') [M]
-		,p2.PayerID [N] ,'' [O], '' [P], p2.PolicyNum [Q], '' [R], '' [S], FORMAT(p2.BeginDate, 'MM/dd/yyyy') [T], FORMAT(p2.EndDate, 'MM/dd/yyyy') [U] 
-
-	 	,NULL   [Unique Case ID]
+	 	 NULL   [Unique Case ID]
         ,pat.MedicalRecordNumber   [Unique Patient ID]
         ,NULL   [Case Name]
         ,NULL   [Case Type code]
         ,NULL   [Case Type Description]
-
         ,p1.PayerID   [Unique Payer ID]
         ,NULL   [Case Priority Code]
         ,NULL   [Case Priority Name]
@@ -87,7 +75,6 @@ CASES = '''
         ,NULL   [Group Name]
         ,FORMAT(p2.BeginDate, 'MM/dd/yyyy')    [Insurance Effective Start Date]
         ,FORMAT(p1.EndDate, 'MM/dd/yyyy')   [Insurance Effective End Date]
-
         ,p2.PayerID   [Unique Payer ID]
         ,NULL   [Case Priority Code]
         ,NULL   [Case Priority Name]
@@ -96,7 +83,7 @@ CASES = '''
         ,NULL   [Group Name]
         ,FORMAT(p2.BeginDate, 'MM/dd/yyyy')   [Insurance Effective Start Date]
         ,FORMAT(p2.EndDate, 'MM/dd/yyyy')   [Insurance Effecive End Date]
-	FROM mydata.Patient AS pat
+	FROM mydata.vwPatientInhouse AS pat
 	LEFT JOIN(
 			SELECT PayerID,'P' [PriorityCode], 'Priority' [PriorityName], pt.Payer [PayerType], ID_Number [PolicyNum], BeginDate, EndDate, Patient_PayerID, PatientID, Sequence
 				, ROW_NUMBER() OVER(PARTITION BY PatientID  ORDER BY Sequence )     AS rk
@@ -111,7 +98,6 @@ CASES = '''
 			LEFT JOIN mydata.AR_PayerType AS pt ON pt.PayerType=pp.PayerType
 			WHERE BeginDate <= GETDATE() AND COALESCE(EndDate, GETDATE()) >= GETDATE()
 		  ) AS p2 ON p2.PatientID=pat.PatientID AND p2.rk=2
-	WHERE pat.CensusStatus = 'In House'
 	ORDER BY pat.LastName, pat.FirstName
 
 '''
