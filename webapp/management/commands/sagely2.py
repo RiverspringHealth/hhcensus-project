@@ -30,7 +30,8 @@ class Command(BaseCommand):
         
     def get_data(self):
         db = sql_api.DatabaseQueryManager()
-        records = db.get_sagely2()
+        sql = '''select * FROM [CensusApps].[mydata].[vwSagely] ORDER BY Resident_Last, Resident_First'''
+        records = db.get_values(sql)
         return records
 
     def write_file(self, records):
@@ -42,9 +43,9 @@ class Command(BaseCommand):
 
     def send_email(self, path):
         outer = MIMEMultipart()
-        outer['Subject'] = '{} Sagely2n'.format(settings.EMAIL_SUBJECT_PREFIX)
+        outer['Subject'] = '{} Sagely2'.format(settings.EMAIL_SUBJECT_PREFIX)
         outer['From'] = 'no-reply@hebrewhome.org'
-        outer['To'] = ', '.join(settings.SAGELY2_DISTRIBUTION_LIST)
+        outer['To'] = ', '.join(settings.SAGELY2_DISTRIBUTION_LIST) #'frederick.sells@riverspring.org' #
         with open(path, 'rb') as fp:
                 part = MIMEBase("application", "octet-stream")
                 part.set_payload(fp.read())

@@ -45,87 +45,87 @@ All_BEDS_AND_CURRENT_OCCUPANTS = '''
         ORDER BY UnitName, RoomName, BedName
         '''
 
-SAGELY2 = '''
-SELECT 1500 [Prop Code]
-	, pat.MedicalRecordNumber [Resident ID]
-	, pat.LastName [Resident_Last]
-	, pat.FirstName [Resident_First]
-	, FORMAT (DateOfBirth, 'MM/dd/yyyy') [DOB]
-	, bed.UnitName [LevelOfCare] --unit goes here
-	, pat.MiddleName [MiddleName]
-	, NULL [MaidenName] -- not used
-	, pat.PreferredName [Nickname]
-	, CASE 
-			WHEN patphone.AreaCode IS NOT NULL THEN  CONCAT('(', patphone.AreaCode, ') ', patphone.Prefix, '-', patphone.Suffix) 
-			ELSE NULL
-	  END [Phone] 
-	, NULL [Email] -- not used
-	, CASE pat.Sex 
-		   WHEN 'M' THEN 'Male'
-		   WHEN 'F' THEN 'Female'
-		   ELSE pat.Sex
-	  END [Gender]
-	, NULL [Ethnicity] --not used
-	, CASE pse.LastStatus 
-		   WHEN 'In House' THEN 'Active'
-		   WHEN 'Discharged' THEN 'Inactive'
-		   WHEN 'Discharged RE' THEN 'Inactive'
-		   WHEN 'Expired' THEN 'Deceased'
-		   ELSE pse.LastStatus
-	  END [Status]
-	, FORMAT( pse.AdmitDate, 'MM/dd/yyyy') [MoveInDate]
-	, bed.RoomName [Room]
-	, SUBSTRING(bed.UnitName, 2, 1) [Floor]
-	, NULL [Diabetic]
-	, NULL [HearingImpairment]
-	, NULL [SpeechImpairment]
-	, NULL [VisionImpairment]
-	, NULL [TherapyAnimal]
-	, NULL [RequireCaine]
-	, NULL [RequiresMotorScooter]
-	, NULL [RequiresWalker]
-	, NULL [RequiresWheelchair]
-	, NULL [AdvanceCareDirective]
-	, NULL [Excursions]
-	, 'Form not Received' [three commas]
-FROM ( 
-	SELECT * 
-	FROM mydata.vwPatientStayElementLatest
-	WHERE LastStatus='In House'
-	OR (LastStatus IN ('Expired', 'Discharged', 'Discharged RE') AND StartDate > DATEADD(day, -30, GETDATE() )  )
-	) AS pse
-JOIN mydata.Patient AS pat ON pat.PatientID = pse.PatientID
-JOIN mydata.FacilityUnitRoomBed AS bed ON bed.BedID=pse.BedID
----------------------------------------------- Emergency Contact ------------------------------------------
-OUTER APPLY (
-		SELECT TOP 1 PatientID, AreaCode, Prefix, Suffix
-		FROM mydata.Phone AS ph
-		JOIN mydata.PatientPhoneXRef AS x ON x.PhoneID=ph.PhoneID
-		JOIN mydata.PhoneType AS pt ON pt.PhoneTypeID=ph.PhoneTypeID
-		WHERE pt.PhoneTypeID NOT IN (5,6) --eliminate fax, leave pager
-			AND x.PatientID = pat.PatientID
-			AND ph.AreaCode IS NOT NULL
-			AND LEN(ph.AreaCode) >1
-		ORDER BY ph.isPrimary DESC, pt.SortOrder
-		) AS patphone
-OUTER APPLY (  -- get contact with lowest priority number which we assume is highest priority.
-		SELECT TOP 1 * 
-		FROM mydata.PatientContact
-		WHERE  EmergencyContact=1
-		AND PatientID = pat.PatientID
-		ORDER BY callPriority
-		) AS pcx  
-LEFT JOIN mydata.Contact AS ec ON ec.ContactID = pcx.ContactID  --emergency contact
-OUTER APPLY (
-			select top 1 ph.AreaCode, ph.Prefix, ph.Suffix
-			FROM mydata.ContactPhoneXref AS xph
-			JOIN mydata.Phone AS ph ON ph.PhoneID = xph.PhoneID
-			JOIN mydata.PhoneType AS pt ON pt.PhoneTypeID=ph.PhoneTypeID
-			WHERE pt.PHoneTypeID   NOT IN(5,6)  -- eliminate fax
-				AND xph.ContactID= ec.ContactID
-				AND LEN(ph.AreaCode)>0
-			ORDER BY pt.SortOrder
-	) AS ecphone 
-ORDER BY Resident_Last, Resident_First, DOB  '''
+# SAGELY2_obsolete = '''
+# SELECT 1500 [Prop Code]
+# 	, pat.MedicalRecordNumber [Resident ID]
+# 	, pat.LastName [Resident_Last]
+# 	, pat.FirstName [Resident_First]
+# 	, FORMAT (DateOfBirth, 'MM/dd/yyyy') [DOB]
+# 	, bed.UnitName [LevelOfCare] --unit goes here
+# 	, pat.MiddleName [MiddleName]
+# 	, NULL [MaidenName] -- not used
+# 	, pat.PreferredName [Nickname]
+# 	, CASE 
+# 			WHEN patphone.AreaCode IS NOT NULL THEN  CONCAT('(', patphone.AreaCode, ') ', patphone.Prefix, '-', patphone.Suffix) 
+# 			ELSE NULL
+# 	  END [Phone] 
+# 	, NULL [Email] -- not used
+# 	, CASE pat.Sex 
+# 		   WHEN 'M' THEN 'Male'
+# 		   WHEN 'F' THEN 'Female'
+# 		   ELSE pat.Sex
+# 	  END [Gender]
+# 	, NULL [Ethnicity] --not used
+# 	, CASE pse.LastStatus 
+# 		   WHEN 'In House' THEN 'Active'
+# 		   WHEN 'Discharged' THEN 'Inactive'
+# 		   WHEN 'Discharged RE' THEN 'Inactive'
+# 		   WHEN 'Expired' THEN 'Deceased'
+# 		   ELSE pse.LastStatus
+# 	  END [Status]
+# 	, FORMAT( pse.AdmitDate, 'MM/dd/yyyy') [MoveInDate]
+# 	, bed.RoomName [Room]
+# 	, SUBSTRING(bed.UnitName, 2, 1) [Floor]
+# 	, NULL [Diabetic]
+# 	, NULL [HearingImpairment]
+# 	, NULL [SpeechImpairment]
+# 	, NULL [VisionImpairment]
+# 	, NULL [TherapyAnimal]
+# 	, NULL [RequireCaine]
+# 	, NULL [RequiresMotorScooter]
+# 	, NULL [RequiresWalker]
+# 	, NULL [RequiresWheelchair]
+# 	, NULL [AdvanceCareDirective]
+# 	, NULL [Excursions]
+# 	, 'Form not Received' [three commas]
+# FROM ( 
+# 	SELECT * 
+# 	FROM mydata.vwPatientStayElementLatest
+# 	WHERE LastStatus='In House'
+# 	OR (LastStatus IN ('Expired', 'Discharged', 'Discharged RE') AND StartDate > DATEADD(day, -30, GETDATE() )  )
+# 	) AS pse
+# JOIN mydata.Patient AS pat ON pat.PatientID = pse.PatientID
+# JOIN mydata.FacilityUnitRoomBed AS bed ON bed.BedID=pse.BedID
+# ---------------------------------------------- Emergency Contact ------------------------------------------
+# OUTER APPLY (
+# 		SELECT TOP 1 PatientID, AreaCode, Prefix, Suffix
+# 		FROM mydata.Phone AS ph
+# 		JOIN mydata.PatientPhoneXRef AS x ON x.PhoneID=ph.PhoneID
+# 		JOIN mydata.PhoneType AS pt ON pt.PhoneTypeID=ph.PhoneTypeID
+# 		WHERE pt.PhoneTypeID NOT IN (5,6) --eliminate fax, leave pager
+# 			AND x.PatientID = pat.PatientID
+# 			AND ph.AreaCode IS NOT NULL
+# 			AND LEN(ph.AreaCode) >1
+# 		ORDER BY ph.isPrimary DESC, pt.SortOrder
+# 		) AS patphone
+# OUTER APPLY (  -- get contact with lowest priority number which we assume is highest priority.
+# 		SELECT TOP 1 * 
+# 		FROM mydata.PatientContact
+# 		WHERE  EmergencyContact=1
+# 		AND PatientID = pat.PatientID
+# 		ORDER BY callPriority
+# 		) AS pcx  
+# LEFT JOIN mydata.Contact AS ec ON ec.ContactID = pcx.ContactID  --emergency contact
+# OUTER APPLY (
+# 			select top 1 ph.AreaCode, ph.Prefix, ph.Suffix
+# 			FROM mydata.ContactPhoneXref AS xph
+# 			JOIN mydata.Phone AS ph ON ph.PhoneID = xph.PhoneID
+# 			JOIN mydata.PhoneType AS pt ON pt.PhoneTypeID=ph.PhoneTypeID
+# 			WHERE pt.PHoneTypeID   NOT IN(5,6)  -- eliminate fax
+# 				AND xph.ContactID= ec.ContactID
+# 				AND LEN(ph.AreaCode)>0
+# 			ORDER BY pt.SortOrder
+# 	) AS ecphone 
+# ORDER BY Resident_Last, Resident_First, DOB  '''
 
 

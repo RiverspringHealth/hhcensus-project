@@ -143,8 +143,8 @@ class DatabaseQueryManager(object):
             results = [names ] + records
         return results
 
-    def get_sagely2(self):
-        return self.get_values(SQL.SAGELY2)
+    # def get_sagely2(self):
+    #     return self.get_values(SQL.SAGELY2)
 
     # def get_occupancy_snapshot(self, querytime):
     #     sql = SQL.OCCUPANCY_SNAPSHOT.format(querytime)
